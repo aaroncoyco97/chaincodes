@@ -15,14 +15,17 @@ export class PoaContract extends Contract {
     }
 
     @Transaction()
-    public async createPoa(ctx: Context, data: string): Promise<void> {
+    @Returns('string')
+    public async createPoa(ctx: Context, data: string): Promise<string> {
         const poas = await this.queryAllPoas(ctx);
         const poasLength = (poas.length + 1).toString();
         const poaId = 'POA' + poasLength.padStart(10, '0000000000');
         const poa = JSON.parse(data);
         poa.id = poaId;
+        poa.estado = 'Pendiente';
         const buffer = Buffer.from(JSON.stringify(poa));
         await ctx.stub.putState(poaId, buffer);
+        return poaId;
     }
 
     @Transaction(false)
@@ -35,6 +38,19 @@ export class PoaContract extends Contract {
         const buffer = await ctx.stub.getState(poaId);
         const poa = JSON.parse(buffer.toString());
         return poa;
+    }
+
+    @Transaction(false)
+    @Returns('number')
+    public async findPOAbyParentUsuarioID(ctx: Context, poaId: string, parentUsuario: string): Promise<number> {
+        const poa = await this.readPoa(ctx, poaId);
+        if (poa['parentUsuario'] !== parentUsuario) {
+            throw new Error(`El POA consultado no es valido o no existe.`);
+        }
+        if (poa['estado'] !== "Aprobado") {
+            throw new Error(`El POA consultado no se encuentra aprobado.`);
+        }
+        return poa['id'];
     }
 
     @Transaction()
@@ -67,7 +83,7 @@ export class PoaContract extends Contract {
     }
 
     @Transaction()
-    public async updateEstado(ctx: Context, poaId: string, estado: boolean): Promise<void> {
+    public async updateEstado(ctx: Context, poaId: string, estado: string): Promise<void> {
         const exists = await this.poaExists(ctx, poaId);
         if (!exists) {
             throw new Error(`The my asset ${poaId} does not exist`);

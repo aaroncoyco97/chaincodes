@@ -1,0 +1,44 @@
+[
+    {
+        "transactionName": "gtfExists",
+        "transactionLabel": "A test gtfExists transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "createGtf",
+        "transactionLabel": "A test createGtf transaction",
+        "arguments": [
+            "001",
+            "some value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "readGtf",
+        "transactionLabel": "A test readGtf transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "updateGtf",
+        "transactionLabel": "A test updateGtf transaction",
+        "arguments": [
+            "001",
+            "some other value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "deleteGtf",
+        "transactionLabel": "A test deleteGtf transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    }
+]

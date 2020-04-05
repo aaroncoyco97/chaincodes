@@ -1,0 +1,44 @@
+[
+    {
+        "transactionName": "pgmfExists",
+        "transactionLabel": "A test pgmfExists transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "createPgmf",
+        "transactionLabel": "A test createPgmf transaction",
+        "arguments": [
+            "001",
+            "some value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "readPgmf",
+        "transactionLabel": "A test readPgmf transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "updatePgmf",
+        "transactionLabel": "A test updatePgmf transaction",
+        "arguments": [
+            "001",
+            "some other value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "deletePgmf",
+        "transactionLabel": "A test deletePgmf transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    }
+]

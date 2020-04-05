@@ -12,6 +12,9 @@ export class Usuario {
     public password: string;
     public nombre: string;
     public apellidos: string;
+    public dni: string;
+    public direccion: string;
     public rol: string;
     public estado: boolean;
+    public parentUsuario?: string;
 }

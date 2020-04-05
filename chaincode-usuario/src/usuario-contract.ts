@@ -15,11 +15,14 @@ export class UsuarioContract extends Contract {
     }
 
     @Transaction()
-    public async createUsuario(ctx: Context, email: string, password: string, nombre: string, apellidos: string, rol: string): Promise<void> {
+    public async createUsuario(ctx: Context, email: string, password: string, nombre: string, apellidos: string, dni: string, direccion: string, rol: string, parentUsuario: string): Promise<void> {
         const usuarios = await this.queryAllUsuarios(ctx);
         const exists = usuarios.find( (user: Usuario) => user.email === email );
         if (exists) {
-            throw new Error(`The usuario ${email} does not exist`);
+            throw new Error(`El usuario ${email} ya se encuentra registrado.`);
+        }
+        if ( password.length < 8 ) {
+            throw new Error(`La contraseña no cumple con los requisitos minimos.`);
         }
         const buffPassword = new Buffer(password);
         const base64Password = buffPassword.toString('base64');
@@ -31,8 +34,11 @@ export class UsuarioContract extends Contract {
         usuario.password = base64Password;
         usuario.nombre = nombre;
         usuario.apellidos = apellidos;
+        usuario.dni = dni;
+        usuario.direccion = direccion;
         usuario.rol = rol;
         usuario.estado = true;
+        usuario.parentUsuario = parentUsuario || "";
         const buffer = Buffer.from(JSON.stringify(usuario));
         await ctx.stub.putState(usuarioId, buffer);
     }
@@ -55,6 +61,20 @@ export class UsuarioContract extends Contract {
                 return allResults;
             }
         }
+    }
+
+    @Transaction(false)
+    @Returns('Usuario[]')
+    public async queryAllUsuariosByRol(ctx: Context, rol: string): Promise<Usuario[]> {
+        const usuarios = await this.queryAllUsuarios(ctx);
+        return usuarios.filter( usuario => usuario.rol === rol );   
+    }
+
+    @Transaction(false)
+    @Returns('Usuario[]')
+    public async queryAllUsuariosByRolAndParentUsuario(ctx: Context, rol: string, parentUsuario: string): Promise<Usuario[]> {
+        const usuariosByRol = await this.queryAllUsuariosByRol(ctx, rol);
+        return usuariosByRol.filter( usuario => usuario.parentUsuario === parentUsuario );
     }
 
     @Transaction(false)
@@ -82,17 +102,18 @@ export class UsuarioContract extends Contract {
     @Transaction(false)
     @Returns('Usuario')
     public async loginUsuario(ctx: Context, email: string, password: string): Promise<Usuario> {
+        const replaceEmail = email.replace('[at]', '@');
         const usuarios = await this.queryAllUsuarios(ctx);
-        const usuario = usuarios.find( (user: Usuario) => user.email === email );
+        const usuario = usuarios.find( (user: Usuario) => user.email === replaceEmail );
         if (!usuario) {
-            throw new Error(`The usuario ${email} does not exist`);
+            throw new Error(`The usuario ${replaceEmail} does not exist`);
         }
         const buffPassword = new Buffer(usuario.password, 'base64');
         const asciiPassword = buffPassword.toString('ascii');
-        if( asciiPassword === password ) {
+        if ( asciiPassword === password ) {
             delete usuario.password;
             return usuario;
-        }else {
+        } else {
             throw new Error(`La password ingresada no es correcta`);
         }
     }

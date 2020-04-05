@@ -3,7 +3,6 @@
  */
 
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
-import { Arbol } from './arbol';
 
 @Info({title: 'ArbolContract', description: 'My Smart Contract' })
 export class ArbolContract extends Contract {
@@ -16,44 +15,39 @@ export class ArbolContract extends Contract {
     }
 
     @Transaction()
-    public async createArbol(ctx: Context, arbolId: string, data: string): Promise<void> {
-        const exists = await this.arbolExists(ctx, arbolId);
-        if (exists) {
-            throw new Error(`The arbol ${arbolId} already exists`);
-        }
-        const arbol = JSON.parse(data) as Arbol;
+    public async createArbol(ctx: Context, data: string): Promise<void> {
+        const arboles = await this.queryAllArboles(ctx); // TENGO 10 ARBOLES
+        const arbolesLength = (arboles.length + 1).toString(); // HAY 10 ARBOLES + 1 = 11
+        const arbolId = 'ARBOL' + arbolesLength.padStart(10, '0000000000'); // CREA EL ID
+        const arbol = JSON.parse(data);
         arbol.id = arbolId;
         const buffer = Buffer.from(JSON.stringify(arbol));
         await ctx.stub.putState(arbolId, buffer);
     }
-
+    
     @Transaction(false)
-    @Returns('Arbol')
-    public async readArbol(ctx: Context, arbolId: string): Promise<Arbol> {
+    @Returns('object')
+    public async readArbol(ctx: Context, arbolId: string): Promise<object> {
         const exists = await this.arbolExists(ctx, arbolId);
         if (!exists) {
             throw new Error(`The arbol ${arbolId} does not exist`);
         }
         const buffer = await ctx.stub.getState(arbolId);
-        const arbol = JSON.parse(buffer.toString()) as Arbol;
+        const arbol = JSON.parse(buffer.toString());
         return arbol;
     }
 
-    @Transaction()
-    public async setPoaArbol(ctx: Context, arbolId: string, poaId: string): Promise<void> {
-        const exists = await this.arbolExists(ctx, arbolId);
-        if (!exists) {
-            throw new Error(`The arbol ${arbolId} does not exist`);
-        }
-        const arbol = await this.readArbol(ctx, arbolId);
-        arbol.poaId = poaId;
-        const buffer = Buffer.from(JSON.stringify(arbol));
-        await ctx.stub.putState(arbolId, buffer);
+    @Transaction(false)
+    @Returns('object[]')
+    public async findArbolesByPOA(ctx: Context, poaId: string): Promise<object[]> {
+        const arboles = await this.queryAllArboles(ctx);
+        const arbolesPoa = arboles.filter( a => a['poaId'] === poaId );
+        return arbolesPoa;
     }
 
     @Transaction()
-    @Returns('Arbol[]')
-    public async queryAllArboles(ctx: Context): Promise<Arbol[]> {
+    @Returns('object[]')
+    public async queryAllArboles(ctx: Context): Promise<object[]> {
         const startKey = 'ARBOL0000000000';
         const endKey = 'ARBOL9999999999';
         const allResults = [];
@@ -61,7 +55,7 @@ export class ArbolContract extends Contract {
         while (true) {
             const res = await iterator.next();
             if (res.value) {
-                const evaluate = JSON.parse(res.value.value.toString('utf8')) as Arbol;
+                const evaluate = JSON.parse(res.value.value.toString('utf8'));
                 allResults.push(evaluate);
             }
             if (res.done) {
