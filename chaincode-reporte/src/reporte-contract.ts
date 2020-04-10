@@ -67,5 +67,4 @@ export class ReporteContract extends Contract {
         }
         await ctx.stub.deleteState(reporteId);
     }
-
 }

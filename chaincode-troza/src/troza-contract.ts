@@ -70,4 +70,17 @@ export class TrozaContract extends Contract {
         await ctx.stub.deleteState(trozaId);
     }
 
+    @Transaction()
+    public async anexarReportePatio(ctx: Context, trozaId: string, reportePatioId: string): Promise<void> {
+        const exists = await this.trozaExists(ctx, trozaId);
+        if (!exists) {
+            throw new Error(`The my asset ${trozaId} does not exist`);
+        }
+        const bufferTrozaId = await ctx.stub.getState(trozaId);
+        const troza = JSON.parse(bufferTrozaId.toString());
+        troza.reportePatioId = reportePatioId;
+        const buffer = Buffer.from(JSON.stringify(troza));
+        await ctx.stub.putState(trozaId, buffer);
+    }
+
 }
