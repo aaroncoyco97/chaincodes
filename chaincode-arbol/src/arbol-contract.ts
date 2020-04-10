@@ -94,6 +94,15 @@ export class ArbolContract extends Contract {
         }
     }
 
+    @Transaction(false)
+    @Returns('object[]')
+    public async findArbolesByPOAandReporte(ctx: Context, poaId: string, tipoReporte: string): Promise<object[]> {
+        const arboles = await this.queryAllArboles(ctx);
+        const arbolesPoa = arboles.filter( a => a['poaId'] === poaId );
+        const arbolesTipoReporte = arbolesPoa.filter( a => a[tipoReporte] );
+        return arbolesTipoReporte;
+    }    
+
     @Transaction()
     public async deleteArbol(ctx: Context, arbolId: string): Promise<void> {
         const exists = await this.arbolExists(ctx, arbolId);
@@ -110,16 +119,18 @@ export class ArbolContract extends Contract {
         if (!exists) {
             throw new Error(`The my asset ${arbolId} does not exist`);
         }
+        
         const bufferArbolId = await ctx.stub.getState(arbolId);
         const arbol = JSON.parse(bufferArbolId.toString());
+        
         if (arbol.reporteTalaId) {
             throw new Error("Este arbol ya tiene un reporte de tala anexado.");
-        } else {
-            arbol.reporteTalaId = reporteTalaId;
-            const buffer = Buffer.from(JSON.stringify(arbol));
-            await ctx.stub.putState(arbolId, buffer);
-            return arbol;
         }
+        
+        arbol.reporteTalaId = reporteTalaId;
+        const buffer = Buffer.from(JSON.stringify(arbol));
+        await ctx.stub.putState(arbolId, buffer);
+        return arbol;
     }
 
     @Transaction(true)
@@ -133,11 +144,11 @@ export class ArbolContract extends Contract {
         const arbol = JSON.parse(bufferArbolId.toString());
         if (arbol.reporteArrastreId) {
             throw new Error("Este arbol ya tiene un reporte de arrastre anexado.");
-        } else {
-            arbol.reporteArrastreId = reporteArrastreId;
-            const buffer = Buffer.from(JSON.stringify(arbol));
-            await ctx.stub.putState(arbolId, buffer);
-            return arbol;
         }
+        
+        arbol.reporteArrastreId = reporteArrastreId;
+        const buffer = Buffer.from(JSON.stringify(arbol));
+        await ctx.stub.putState(arbolId, buffer);
+        return arbol;
     }
 }
