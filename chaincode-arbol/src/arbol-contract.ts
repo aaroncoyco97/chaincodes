@@ -103,8 +103,9 @@ export class ArbolContract extends Contract {
         await ctx.stub.deleteState(arbolId);
     }
 
-    @Transaction()
-    public async anexarReporteTala(ctx: Context, arbolId: string, reporteTalaId: string): Promise<void> {
+    @Transaction(true)
+    @Returns('object')
+    public async anexarReporteTala(ctx: Context, arbolId: string, reporteTalaId: string): Promise<object> {
         const exists = await this.arbolExists(ctx, arbolId);
         if (!exists) {
             throw new Error(`The my asset ${arbolId} does not exist`);
@@ -114,10 +115,12 @@ export class ArbolContract extends Contract {
         arbol.reporteTalaId = reporteTalaId;
         const buffer = Buffer.from(JSON.stringify(arbol));
         await ctx.stub.putState(arbolId, buffer);
+        return arbol;
     }
 
-    @Transaction()
-    public async anexarReporteArrastre(ctx: Context, arbolId: string, reporteArrastreId: string): Promise<void> {
+    @Transaction(true)
+    @Returns('object')
+    public async anexarReporteArrastre(ctx: Context, arbolId: string, reporteArrastreId: string): Promise<object> {
         const exists = await this.arbolExists(ctx, arbolId);
         if (!exists) {
             throw new Error(`The my asset ${arbolId} does not exist`);
@@ -127,5 +130,6 @@ export class ArbolContract extends Contract {
         arbol.reporteArrastreId = reporteArrastreId;
         const buffer = Buffer.from(JSON.stringify(arbol));
         await ctx.stub.putState(arbolId, buffer);
+        return arbol;
     }
 }

@@ -67,4 +67,11 @@ export class ReporteContract extends Contract {
         }
         await ctx.stub.deleteState(reporteId);
     }
+
+    @Transaction(false)
+    @Returns('object[]')
+    public async queryAllReportesTala(ctx: Context, rol: string, parentUsuario: string): Promise<object[]> {
+        const reportes = await this.queryAllReportes(ctx);
+        return reportes.filter( (reporte: any) => reporte.tipoReporte === 'ReporteTala' );
+    }
 }
