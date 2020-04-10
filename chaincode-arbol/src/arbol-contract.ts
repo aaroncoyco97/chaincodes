@@ -112,10 +112,14 @@ export class ArbolContract extends Contract {
         }
         const bufferArbolId = await ctx.stub.getState(arbolId);
         const arbol = JSON.parse(bufferArbolId.toString());
-        arbol.reporteTalaId = reporteTalaId;
-        const buffer = Buffer.from(JSON.stringify(arbol));
-        await ctx.stub.putState(arbolId, buffer);
-        return arbol;
+        if (arbol.reporteTalaId) {
+            throw new Error("Este arbol ya tiene un reporte de tala anexado.");
+        } else {
+            arbol.reporteTalaId = reporteTalaId;
+            const buffer = Buffer.from(JSON.stringify(arbol));
+            await ctx.stub.putState(arbolId, buffer);
+            return arbol;
+        }
     }
 
     @Transaction(true)
@@ -127,9 +131,13 @@ export class ArbolContract extends Contract {
         }
         const bufferArbolId = await ctx.stub.getState(arbolId);
         const arbol = JSON.parse(bufferArbolId.toString());
-        arbol.reporteArrastreId = reporteArrastreId;
-        const buffer = Buffer.from(JSON.stringify(arbol));
-        await ctx.stub.putState(arbolId, buffer);
-        return arbol;
+        if (arbol.reporteArrastreId) {
+            throw new Error("Este arbol ya tiene un reporte de arrastre anexado.");
+        } else {
+            arbol.reporteArrastreId = reporteArrastreId;
+            const buffer = Buffer.from(JSON.stringify(arbol));
+            await ctx.stub.putState(arbolId, buffer);
+            return arbol;
+        }
     }
 }

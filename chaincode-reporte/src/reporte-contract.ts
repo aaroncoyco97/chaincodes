@@ -70,8 +70,22 @@ export class ReporteContract extends Contract {
 
     @Transaction(false)
     @Returns('object[]')
-    public async queryAllReportesTala(ctx: Context, rol: string, parentUsuario: string): Promise<object[]> {
+    public async queryAllReportesTala(ctx: Context): Promise<object[]> {
         const reportes = await this.queryAllReportes(ctx);
         return reportes.filter( (reporte: any) => reporte.tipoReporte === 'ReporteTala' );
+    }
+
+    @Transaction(false)
+    @Returns('object[]')
+    public async queryAllReportesArrastre(ctx: Context): Promise<object[]> {
+        const reportes = await this.queryAllReportes(ctx);
+        return reportes.filter( (reporte: any) => reporte.tipoReporte === 'ReporteArrastre' );
+    }
+
+    @Transaction(false)
+    @Returns('object[]')
+    public async queryAllReportesPatio(ctx: Context): Promise<object[]> {
+        const reportes = await this.queryAllReportes(ctx);
+        return reportes.filter( (reporte: any) => reporte.tipoReporte === 'ReportePatio' );
     }
 }

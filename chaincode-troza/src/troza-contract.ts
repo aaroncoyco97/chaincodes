@@ -79,10 +79,13 @@ export class TrozaContract extends Contract {
         }
         const bufferTrozaId = await ctx.stub.getState(trozaId);
         const troza = JSON.parse(bufferTrozaId.toString());
-        troza.reportePatioId = reportePatioId;
-        const buffer = Buffer.from(JSON.stringify(troza));
-        await ctx.stub.putState(trozaId, buffer);
-        return troza;
+        if (troza.reportePatioId) {
+            throw new Error("Esta troza ya tiene un reporte de patio anexado.");
+        } else {
+            troza.reportePatioId = reportePatioId;
+            const buffer = Buffer.from(JSON.stringify(troza));
+            await ctx.stub.putState(trozaId, buffer);
+            return troza;
+        }
     }
-
 }
