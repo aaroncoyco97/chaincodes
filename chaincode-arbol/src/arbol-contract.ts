@@ -16,13 +16,42 @@ export class ArbolContract extends Contract {
 
     @Transaction()
     public async createArbol(ctx: Context, data: string): Promise<void> {
-        const arboles = await this.queryAllArboles(ctx); // TENGO 10 ARBOLES
-        const arbolesLength = (arboles.length + 1).toString(); // HAY 10 ARBOLES + 1 = 11
-        const arbolId = 'ARBOL' + arbolesLength.padStart(10, '0000000000'); // CREA EL ID
         const arbol = JSON.parse(data);
-        arbol.id = arbolId;
-        const buffer = Buffer.from(JSON.stringify(arbol));
-        await ctx.stub.putState(arbolId, buffer);
+        if( arbol.ubicacion && arbol.ubicacion.latitud && arbol.ubicacion.longitud ) {
+            const arboles = await this.queryAllArboles(ctx);
+
+            const getDistanciaMetros = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+                let rad = function(x) {return x*Math.PI/180;}
+                var R = 6378.137; //Radio de la tierra en km 
+                var dLat = rad( lat2 - lat1 );
+                var dLong = rad( lon2 - lon1 );
+                var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(rad(lat1)) * 
+                Math.cos(rad(lat2)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                var d = R * c * 1000; 
+                return d; 
+            }
+
+            const existeCerca = arboles.filter( (ar: any) => {
+                const distancia = getDistanciaMetros( 
+                  ar.ubicacion.latitud, ar.ubicacion.longitud, 
+                  arbol.ubicacion.latitud, arbol.ubicacion.longitud
+                );              
+                return distancia < 0.1 ? true : false;
+            } );
+
+            if( existeCerca && existeCerca.length > 0 ) {
+                throw new Error(`El arbol registrado ya existe en la red.`);
+            }
+
+            const arbolesLength = (arboles.length + 1).toString();
+            const arbolId = 'ARBOL' + arbolesLength.padStart(10, '0000000000');
+            arbol.id = arbolId;
+            const buffer = Buffer.from(JSON.stringify(arbol));
+            await ctx.stub.putState(arbolId, buffer);
+        } else {
+            throw new Error(`El arbol no cuenta con ubicación.`);
+        }
     }
     
     @Transaction(false)
@@ -73,5 +102,4 @@ export class ArbolContract extends Contract {
         }
         await ctx.stub.deleteState(arbolId);
     }
-
 }
