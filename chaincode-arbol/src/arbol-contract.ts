@@ -151,4 +151,18 @@ export class ArbolContract extends Contract {
         await ctx.stub.putState(arbolId, buffer);
         return arbol;
     }
+
+    @Transaction(true)
+    @Returns('object')
+    public async trozarArbol(ctx: Context, arbolId: string): Promise<void> {
+        const exists = await this.arbolExists(ctx, arbolId);
+        if (!exists) {
+            throw new Error(`The my asset ${arbolId} does not exist`);
+        }
+        const bufferArbolId = await ctx.stub.getState(arbolId);
+        const arbol = JSON.parse(bufferArbolId.toString());
+        arbol.trozado = true;
+        const buffer = Buffer.from(JSON.stringify(arbol));
+        await ctx.stub.putState(arbolId, buffer);
+    }
 }
