@@ -1,6 +1,6 @@
 {
     "name": "chaincode-poa",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Smart Contract POA",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
