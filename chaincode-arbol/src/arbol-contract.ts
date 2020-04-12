@@ -48,7 +48,7 @@ export class ArbolContract extends Contract {
             const arbolId = 'ARBOL' + arbolesLength.padStart(10, '0000000000');
             arbol.id = arbolId;
             arbol.fecha = new Date();
-            arbol.trozado = false;
+            arbol.trozado = 0;
             const buffer = Buffer.from(JSON.stringify(arbol));
             await ctx.stub.putState(arbolId, buffer);
         } else {
@@ -156,14 +156,14 @@ export class ArbolContract extends Contract {
 
     @Transaction(true)
     @Returns('object')
-    public async trozarArbol(ctx: Context, arbolId: string): Promise<void> {
+    public async trozarArbol(ctx: Context, arbolId: string, trozado: number): Promise<void> {
         const exists = await this.arbolExists(ctx, arbolId);
         if (!exists) {
             throw new Error(`The my asset ${arbolId} does not exist`);
         }
         const bufferArbolId = await ctx.stub.getState(arbolId);
         const arbol = JSON.parse(bufferArbolId.toString());
-        arbol.trozado = true;
+        arbol.trozado = trozado;
         const buffer = Buffer.from(JSON.stringify(arbol));
         await ctx.stub.putState(arbolId, buffer);
     }
