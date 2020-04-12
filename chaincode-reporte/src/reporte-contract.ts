@@ -42,6 +42,7 @@ export class ReporteContract extends Contract {
         const reporteId = 'REPORTE' + reportesLength.padStart(10, '0000000000');
         const reporte = JSON.parse(data);
         reporte.id = reporteId;
+        reporte.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(reporte));
         await ctx.stub.putState(reporteId, buffer);
         return reporteId;

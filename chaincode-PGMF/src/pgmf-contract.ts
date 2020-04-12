@@ -42,6 +42,7 @@ export class PgmfContract extends Contract {
         const pgmfId = 'PGMF' + pgmfsLength.padStart(10, '0000000000');
         const pgmf = JSON.parse(data);
         pgmf.id = pgmfId;
+        pgmf.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(pgmf));
         await ctx.stub.putState(pgmfId, buffer);
         return pgmfId;

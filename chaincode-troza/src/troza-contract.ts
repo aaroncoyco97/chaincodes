@@ -42,6 +42,7 @@ export class TrozaContract extends Contract {
         const trozaId = 'TROZA' + trozasLength.padStart(10, '0000000000');
         const troza = JSON.parse(data);
         troza.id = trozaId;
+        troza.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(troza));
         await ctx.stub.putState(trozaId, buffer);
         return trozaId;

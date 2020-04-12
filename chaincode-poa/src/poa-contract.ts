@@ -22,6 +22,7 @@ export class PoaContract extends Contract {
         const poaId = 'POA' + poasLength.padStart(10, '0000000000');
         const poa = JSON.parse(data);
         poa.id = poaId;
+        poa.fecha = new Date();
         poa.estado = 'Pendiente';
         const buffer = Buffer.from(JSON.stringify(poa));
         await ctx.stub.putState(poaId, buffer);

@@ -47,6 +47,7 @@ export class ArbolContract extends Contract {
             const arbolesLength = (arboles.length + 1).toString();
             const arbolId = 'ARBOL' + arbolesLength.padStart(10, '0000000000');
             arbol.id = arbolId;
+            arbol.fecha = new Date();
             arbol.trozado = false;
             const buffer = Buffer.from(JSON.stringify(arbol));
             await ctx.stub.putState(arbolId, buffer);
