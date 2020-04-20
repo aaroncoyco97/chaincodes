@@ -156,15 +156,22 @@ export class ArbolContract extends Contract {
 
     @Transaction(true)
     @Returns('object')
-    public async trozarArbol(ctx: Context, arbolId: string, trozado: number): Promise<void> {
+    public async trozarArbol(ctx: Context, arbolId: string): Promise<object> {
         const exists = await this.arbolExists(ctx, arbolId);
         if (!exists) {
             throw new Error(`The my asset ${arbolId} does not exist`);
         }
         const bufferArbolId = await ctx.stub.getState(arbolId);
         const arbol = JSON.parse(bufferArbolId.toString());
-        arbol.trozado = trozado;
+                
+        arbol.trozado = arbol.trozado + 1;
+
+        if( arbol.trozado > arbol.informacionGeneral.maximoTrozas ) {
+            throw new Error(`El arbol ${arbolId} ya tiene el maximo numero de trozas.`);
+        }
+
         const buffer = Buffer.from(JSON.stringify(arbol));
         await ctx.stub.putState(arbolId, buffer);
+        return arbol;
     }
 }

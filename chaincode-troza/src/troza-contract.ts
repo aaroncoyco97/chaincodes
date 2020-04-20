@@ -35,8 +35,8 @@ export class TrozaContract extends Contract {
     }
 
     @Transaction()
-    @Returns('string')
-    public async createTroza(ctx: Context, data: string): Promise<string> {
+    @Returns('object')
+    public async createTroza(ctx: Context, data: string): Promise<object> {
         const trozas = await this.queryAllTrozas(ctx);
         const trozasLength = (trozas.length + 1).toString();
         const trozaId = 'TROZA' + trozasLength.padStart(10, '0000000000');
@@ -45,7 +45,7 @@ export class TrozaContract extends Contract {
         troza.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(troza));
         await ctx.stub.putState(trozaId, buffer);
-        return trozaId;
+        return troza;
     }
 
     @Transaction(false)

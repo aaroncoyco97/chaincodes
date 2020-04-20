@@ -1,6 +1,6 @@
 {
     "name": "chaincode-arbol",
-    "version": "0.3.5",
+    "version": "0.3.8",
     "description": "Smart Contract Arbol",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
