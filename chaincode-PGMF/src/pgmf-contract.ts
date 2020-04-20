@@ -42,6 +42,7 @@ export class PgmfContract extends Contract {
         const pgmfId = 'PGMF' + pgmfsLength.padStart(10, '0000000000');
         const pgmf = JSON.parse(data);
         pgmf.id = pgmfId;
+        pgmf.estado = "Pendiente";
         pgmf.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(pgmf));
         await ctx.stub.putState(pgmfId, buffer);
@@ -60,6 +61,19 @@ export class PgmfContract extends Contract {
         return pgmf;
     }
 
+    @Transaction(false)
+    @Returns('number')
+    public async findPGMFbyParentUsuarioID(ctx: Context, pgmfId: string, parentUsuario: string): Promise<number> {
+        const pgmf = await this.readPgmf(ctx, pgmfId);
+        if (pgmf['parentUsuario'] !== parentUsuario) {
+            throw new Error(`El PGMF consultado no es valido o no existe.`);
+        }
+        if (pgmf['estado'] !== "Aprobado") {
+            throw new Error(`El PGMF consultado no se encuentra aprobado.`);
+        }
+        return pgmf['id'];
+    }
+
     @Transaction()
     public async deletePgmf(ctx: Context, pgmfId: string): Promise<void> {
         const exists = await this.pgmfExists(ctx, pgmfId);
@@ -67,6 +81,19 @@ export class PgmfContract extends Contract {
             throw new Error(`The pgmf ${pgmfId} does not exist`);
         }
         await ctx.stub.deleteState(pgmfId);
+    }
+
+    @Transaction()
+    public async updateEstado(ctx: Context, pgmfId: string, estado: string): Promise<void> {
+        const exists = await this.pgmfExists(ctx, pgmfId);
+        if (!exists) {
+            throw new Error(`The my asset ${pgmfId} does not exist`);
+        }
+        const bufferPgmfId = await ctx.stub.getState(pgmfId);
+        const pgmf = JSON.parse(bufferPgmfId.toString());
+        pgmf.estado = estado;
+        const buffer = Buffer.from(JSON.stringify(pgmf));
+        await ctx.stub.putState(pgmfId, buffer);
     }
 
 }
