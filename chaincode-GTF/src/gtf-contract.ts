@@ -42,6 +42,7 @@ export class GtfContract extends Contract {
         const gtfId = 'GTF' + gtfsLength.padStart(10, '0000000000');
         const gtf = JSON.parse(data);
         gtf.id = gtfId;
+        gtf.fecha = new Date();
         const buffer = Buffer.from(JSON.stringify(gtf));
         await ctx.stub.putState(gtfId, buffer);
         return gtfId;
