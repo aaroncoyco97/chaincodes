@@ -15,7 +15,7 @@ export class UsuarioContract extends Contract {
     }
 
     @Transaction()
-    public async createUsuario(ctx: Context, email: string, password: string, nombre: string, apellidos: string, dni: string, direccion: string, rol: string, parentUsuario: string): Promise<void> {
+    public async createUsuario(ctx: Context, empresa: string, email: string, password: string, nombre: string, apellidos: string, dni: string, direccion: string, rol: string, parentUsuario: string): Promise<void> {
         const usuarios = await this.queryAllUsuarios(ctx);
         const exists = usuarios.find( (user: Usuario) => user.email === email );
         if (exists) {
@@ -31,6 +31,7 @@ export class UsuarioContract extends Contract {
         const usuario = new Usuario();
         usuario.id = usuarioId;
         usuario.email = email;
+        usuario.empresa = empresa;
         usuario.password = base64Password;
         usuario.nombre = nombre;
         usuario.apellidos = apellidos;

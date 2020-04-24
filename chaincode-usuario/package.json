@@ -1,6 +1,6 @@
 {
   "name": "chaincode-usuario",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "My Smart Contract",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

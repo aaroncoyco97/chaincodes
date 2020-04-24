@@ -90,4 +90,24 @@ export class TrozaContract extends Contract {
         await ctx.stub.putState(trozaId, buffer);
         return troza;
     }
+
+    @Transaction(true)
+    @Returns('object')
+    public async anexarGTF(ctx: Context, trozaId: string, gtfId: string): Promise<object> {
+        const exists = await this.trozaExists(ctx, trozaId);
+        if (!exists) {
+            throw new Error(`The my asset ${trozaId} does not exist`);
+        }
+        const bufferTrozaId = await ctx.stub.getState(trozaId);
+        const troza = JSON.parse(bufferTrozaId.toString());
+        
+        if (troza.gtfId) {
+            throw new Error("Esta troza ya tiene un reporte de patio anexado.");
+        }
+
+        troza.gtfId = gtfId;
+        const buffer = Buffer.from(JSON.stringify(troza));
+        await ctx.stub.putState(trozaId, buffer);
+        return troza;
+    }
 }

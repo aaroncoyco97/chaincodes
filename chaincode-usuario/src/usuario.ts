@@ -8,6 +8,7 @@ import { Object, Property } from 'fabric-contract-api';
 export class Usuario {
     @Property()
     public id: string;
+    public empresa: string;
     public email: string;
     public password: string;
     public nombre: string;
