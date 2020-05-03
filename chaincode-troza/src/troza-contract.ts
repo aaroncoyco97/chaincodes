@@ -102,7 +102,7 @@ export class TrozaContract extends Contract {
         const troza = JSON.parse(bufferTrozaId.toString());
         
         if (troza.gtfId) {
-            throw new Error("Esta troza ya tiene un reporte de patio anexado.");
+            throw new Error("Esta troza ya tiene una GTF anexada.");
         }
 
         troza.gtfId = gtfId;
